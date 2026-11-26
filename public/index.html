@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d3931">
+  <meta name="description" content="查询 CCF 和 CACR 推荐期刊、会议及投稿截止时间。">
+  <title>ShowJCR · 投稿日历</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到内容</a>
+  <header class="header">
+    <div class="header-inner">
+      <a href="#calendar" class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>ShowJCR</a>
+      <nav aria-label="主导航">
+        <a href="#calendar" data-tab="calendar">投稿日历</a>
+        <a href="#catalog" data-tab="catalog">期刊与会议</a>
+        <a href="#favorites" data-tab="favorites">我的截稿</a>
+      </nav>
+      <div id="account" class="account" aria-live="polite"></div>
+    </div>
+  </header>
+  <main id="main" class="shell">
+    <section id="hero" class="hero" aria-labelledby="title">
+      <div>
+        <h1 id="title">投稿日历</h1>
+        <p id="subtitle">查找 CCF、CACR 推荐会议的截稿时间。</p>
+        <p id="sync" class="sync" aria-live="polite">正在检查截稿数据</p>
+      </div>
+      <div class="hero-calendar" aria-hidden="true">
+        <div class="hero-calendar-top"><span></span><span></span></div>
+        <div class="hero-calendar-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </section>
+    <section class="content" aria-label="查询结果">
+      <div id="filters" class="filters">
+        <label class="search"><span class="search-icon" aria-hidden="true"></span><span class="visually-hidden">搜索名称或简称</span><input id="search" type="search" placeholder="搜索名称或简称，如 ICLR"></label>
+        <div class="selects">
+          <label id="kind-filter">类型<select id="kind"><option value="">全部</option><option value="conference">会议</option><option value="journal">期刊</option></select></label>
+          <label>CCF<select id="ccf"><option value="">全部</option><option value="A">A / T1</option><option value="B">B / T2</option><option value="C">C / T3</option><option value="none">未收录</option></select></label>
+          <label>CACR<select id="cacr"><option value="">全部</option><option value="A">A 类</option><option value="B">B 类</option><option value="C">C 类</option><option value="none">未收录</option></select></label>
+          <label>地区<select id="region"><option value="">全部</option><option value="CN">中国</option><option value="foreign">外国</option><option value="unknown">待确认</option></select></label>
+          <label id="status-filter">截稿状态<select id="status"><option value="upcoming">即将截稿</option><option value="">全部</option><option value="tbd">待公布</option><option value="closed">已截止</option></select></label>
+          <button id="reset" type="button" class="link-button">重置</button>
+        </div>
+      </div>
+      <div id="message" role="status" class="message" hidden></div>
+      <div class="results-heading"><span id="count" aria-live="polite"></span><span id="timezone"></span></div>
+      <div id="results" aria-busy="true"></div>
+      <div id="more" class="more" hidden><button type="button" class="button" id="show-more">显示更多</button></div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="shell">
+      <span>ShowJCR · 投稿查询</span>
+      <div>
+        <a href="https://www.ccf.org.cn/Academic_Evaluation/By_category/2026-03-05/861526.shtml">CCF 2026</a>
+        <a href="https://www.ccf.org.cn/ccftjgjxskwml/">CCF-T 2025</a>
+        <a href="https://www.cacrnet.org.cn/site/content/1675.html">CACR 2025</a>
+        <a href="https://ccfddl.com/">CCFDDL</a>
+        <a href="https://github.com/hitfyd/ShowJCR">桌面版</a>
+        <a href="https://github.com/lingyun-2024/showjcr-web">本站源码</a>
+      </div>
+    </div>
+  </footer>
+  <dialog id="details" aria-labelledby="detail-title">
+    <div class="dialog-top"><button id="close-details" class="button secondary" type="button">关闭</button></div>
+    <div id="detail-body"></div>
+  </dialog>
+  <noscript><p class="shell">请启用 JavaScript 后使用查询和倒计时。</p></noscript>
+</body>
+</html>
