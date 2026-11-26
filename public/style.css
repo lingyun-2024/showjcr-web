@@ -62,6 +62,7 @@ input, select { border: 1px solid var(--line); background: #fbfcf8; border-radiu
 .selects select { min-height: 39px; min-width: 78px; padding: 5px 9px; }
 .link-button { border: 0; background: transparent; color: var(--green); font-size: .86rem; font-weight: 650; padding: 9px 6px; }
 .link-button:hover { text-decoration: underline; }
+.sci-source { display: flex; align-items: center; flex-wrap: wrap; gap: 0 9px; padding: 2px 5px; color: var(--muted); font-size: .85rem; }
 .results-heading { display: flex; justify-content: space-between; color: var(--muted); font-size: .87rem; margin: 18px 0 8px; }
 .message { padding: 11px 14px; background: #fff5de; border: 1px solid #efdeb7; border-radius: 8px; color: #71470d; margin-top: 14px; }
 .results-list { display: grid; gap: 10px; }
