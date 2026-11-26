@@ -49,6 +49,10 @@ def new_entry(row):
              "ccf": None if ccf == "-" else ccf, "cacr": None if cacr == "-" else cacr,
              "grade": grade,
              "international": international, "chinese": chinese, "region": region}
+    if kind == "journal":
+        raw_sci = row["SCI大类分区（2025）"]
+        assert raw_sci in {"1", "2", "3", "4", "无有效SCI分区"}, name
+        entry["sci"] = "none" if raw_sci == "无有效SCI分区" else raw_sci
     if links and region != "unknown":
         entry["regionSources"] = links[:3]
     if dblp:

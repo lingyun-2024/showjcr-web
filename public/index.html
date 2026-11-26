@@ -43,17 +43,12 @@
           <label>CCF<select id="ccf"><option value="">全部</option><option value="A">A / T1</option><option value="B">B / T2</option><option value="C">C / T3</option><option value="none">未收录</option></select></label>
           <label>CACR<select id="cacr"><option value="">全部</option><option value="A">A 类</option><option value="B">B 类</option><option value="C">C 类</option><option value="none">未收录</option></select></label>
           <label>地区<select id="region"><option value="">全部</option><option value="CN">中国</option><option value="foreign">外国</option><option value="unknown">待确认</option></select></label>
-          <label id="sci-filter" hidden>SCI 分区<select id="sci" aria-describedby="sci-hint" disabled><option value="">全部</option><option value="top2">1–2 区</option><option value="1">1 区</option><option value="2">2 区</option><option value="3">3 区</option><option value="4">4 区</option><option value="none">无有效分区</option></select></label>
+          <label id="sci-filter" hidden>SCI 分区<select id="sci" aria-describedby="sci-hint"><option value="">全部</option><option value="top2">1–2 区</option><option value="1">1 区</option><option value="2">2 区</option><option value="3">3 区</option><option value="4">4 区</option><option value="none">无有效分区</option></select></label>
           <label id="status-filter">截稿状态<select id="status"><option value="upcoming">即将截稿</option><option value="">全部</option><option value="tbd">待公布</option><option value="closed">已截止</option></select></label>
           <button id="reset" type="button" class="link-button">重置</button>
         </div>
       </div>
-      <div id="sci-source" class="sci-source" hidden>
-        <span id="sci-hint" role="status">导入 ShowJCR 逐条复核 TSV 后，可筛选 2025 年中科院 SCI 大类分区。文件在浏览器内读取。</span>
-        <input id="sci-file" type="file" accept=".tsv,text/tab-separated-values" hidden>
-        <button id="sci-import" type="button" class="link-button" disabled>导入分区表</button>
-        <button id="sci-clear" type="button" class="link-button" hidden>清除本地分区</button>
-      </div>
+      <p id="sci-source" class="sci-source" hidden><span id="sci-hint">2025 年中科院 SCI 大类分区</span></p>
       <div id="message" role="status" class="message" hidden></div>
       <div class="results-heading"><span id="count" aria-live="polite"></span><span id="timezone"></span></div>
       <div id="results" aria-busy="true"></div>

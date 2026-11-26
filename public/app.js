@@ -1,7 +1,6 @@
-import { matchesSciZone, readSciZones, savedSciZones } from './sci.js';
+import { matchesSciZone } from './sci.js';
 
 const $ = (id) => document.getElementById(id);
-const SCI_STORAGE_KEY = 'showjcr-sci-2025';
 const PAGE_SIZE = 24;
 const localDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' });
 const regionNames = { CN: '中国', foreign: '外国', unknown: '待确认' };
@@ -15,7 +14,7 @@ const fields = ['search', 'kind', 'grade', 'ccf', 'cacr', 'region', 'sci', 'stat
 const state = {
   tab: 'calendar', count: PAGE_SIZE, catalog: [], byId: new Map(), covered: new Set(),
   editions: [], favorites: [], user: null, loginAvailable: false, catalogLoading: true,
-  deadlineLoading: true, catalogError: false, favoritesError: false, pending: new Set(), sciZones: new Map(),
+  deadlineLoading: true, catalogError: false, favoritesError: false, pending: new Set(),
 };
 
 function escapeHtml(value) {
@@ -51,7 +50,7 @@ function tags(entry, showType = false) {
   const ccf = [...entry.international, ...entry.chinese].join(' / ');
   if (ccf) bits.push('CCF ' + ccf);
   if (entry.cacr) bits.push('CACR ' + entry.cacr);
-  const sci = state.sciZones.get(entry.id);
+  const sci = entry.sci;
   if (sci) bits.push(sci === 'none' ? 'SCI · 无有效分区' : 'SCI ' + sci + ' 区');
   bits.push((entry.kind === 'conference' ? '主办方 · ' : '地区 · ') + regionNames[entry.region]);
   return '<div class="tags">' + bits.map((entry) => '<span class="tag">' + escapeHtml(entry) + '</span>').join('') + '</div>';
@@ -80,7 +79,7 @@ function matches(venue) {
     if ($(rank).value && (venue[rank] || 'none') !== $(rank).value) return false;
   }
   if (state.tab === 'catalog' && $('kind').value !== 'conference' &&
-      !matchesSciZone($('sci').value, state.sciZones.get(venue.id))) return false;
+      !matchesSciZone($('sci').value, venue.sci)) return false;
   return !$('region').value || $('region').value === venue.region;
 }
 
@@ -134,12 +133,7 @@ function render() {
   const showSci = state.tab === 'catalog' && $('kind').value !== 'conference';
   $('sci-filter').hidden = !showSci;
   $('sci-source').hidden = !showSci;
-  $('sci').disabled = !state.sciZones.size;
-  $('sci-import').disabled = state.catalogLoading || state.catalogError;
-  $('sci-clear').hidden = !state.sciZones.size;
-  $('sci-hint').textContent = state.sciZones.size
-    ? '已导入 ' + state.sciZones.size + ' 本期刊 · 2025 年中科院 SCI 大类 · 本机浏览器'
-    : '导入 ShowJCR 逐条复核 TSV 后，可筛选 2025 年中科院 SCI 大类分区。文件在浏览器内读取。';
+  $('sci').disabled = state.catalogLoading || state.catalogError;
   $('timezone').textContent = state.tab === 'catalog' ? '' : '本地时间 · ' + new Intl.DateTimeFormat().resolvedOptions().timeZone;
   $('results').setAttribute('aria-busy', state.catalogLoading || (state.tab !== 'catalog' && state.deadlineLoading));
   $('more').hidden = true;
@@ -356,40 +350,6 @@ async function updateStar(key, button) {
   }
 }
 
-$('sci-import').addEventListener('click', () => $('sci-file').click());
-$('sci-file').addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  event.target.value = '';
-  if (!file) return;
-  try {
-    if (file.size > 5_000_000) throw new Error('请使用 5 MB 以内的 ShowJCR 逐条复核 TSV 文件。');
-    state.sciZones = readSciZones(await file.text(), state.catalog);
-    $('sci').value = '';
-    state.count = PAGE_SIZE;
-    try {
-      localStorage.setItem(SCI_STORAGE_KEY, JSON.stringify([...state.sciZones]));
-      message();
-    } catch {
-      message('本次已导入分区。浏览器限制保存，刷新后需重新导入。');
-    }
-    render();
-  } catch (error) {
-    message(error.message);
-  }
-});
-$('sci-clear').addEventListener('click', () => {
-  state.sciZones.clear();
-  $('sci').value = '';
-  state.count = PAGE_SIZE;
-  try {
-    localStorage.removeItem(SCI_STORAGE_KEY);
-    message();
-  } catch {
-    message('浏览器限制清除已保存的分区。可在浏览器设置中清除本站数据。');
-  }
-  render();
-});
-
 function resetFilters() {
   for (const id of fields) $(id).value = id === 'status' ? 'upcoming' : '';
   state.count = PAGE_SIZE;
@@ -432,11 +392,6 @@ if (url.searchParams.has('auth')) {
   message(url.searchParams.get('auth') === 'unavailable' ? 'GitHub 登录尚未启用。' : '未完成 GitHub 登录，可重新尝试。');
   url.searchParams.delete('auth');
   history.replaceState(null, '', url);
-}
-try {
-  state.sciZones = savedSciZones(localStorage.getItem(SCI_STORAGE_KEY));
-} catch {
-  // The catalog remains usable when browser storage is unavailable.
 }
 changeTab();
 await Promise.all([loadCatalog(), loadDeadlines(), loadAccount()]);

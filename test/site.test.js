@@ -60,7 +60,7 @@ test('public catalog preserves candidate types, original Chinese tiers and publi
   assert.equal(catalog.filter((entry) => entry.kind === 'conference').length, 396);
   assert.equal(new Set(catalog.map((entry) => entry.id)).size, 760);
   const allowed = new Set(['id', 'name', 'kind', 'aliases', 'ccf', 'cacr', 'grade', 'international', 'chinese', 'region',
-    'regionSources', 'dblp']);
+    'regionSources', 'dblp', 'sci']);
   for (const entry of catalog) {
     assert.ok(entry.ccf || entry.cacr);
     assert.match(entry.grade, /^[ABC]$/);
