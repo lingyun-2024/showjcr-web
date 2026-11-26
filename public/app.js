@@ -44,7 +44,7 @@ function message(value = '') {
 function tags(entry, showType = false) {
   const bits = [];
   if (showType) bits.push(entry.kind === 'conference' ? '会议' : '期刊');
-  if (state.tab !== 'calendar' && entry.grade) bits.push('成果 ' + entry.grade);
+  if (entry.grade) bits.push('成果 ' + entry.grade);
   const ccf = [...entry.international, ...entry.chinese].join(' / ');
   if (ccf) bits.push('CCF ' + ccf);
   if (entry.cacr) bits.push('CACR ' + entry.cacr);
@@ -71,8 +71,7 @@ function matches(venue) {
   const query = normalize($('search').value);
   if (query && ![venue.name, ...venue.aliases].some((name) => normalize(name).includes(query))) return false;
   if (state.tab === 'catalog' && $('kind').value && venue.kind !== $('kind').value) return false;
-  if (state.tab !== 'calendar' && $('grade').value && venue.grade !== $('grade').value) return false;
-  for (const rank of ['ccf', 'cacr']) {
+  for (const rank of ['grade', 'ccf', 'cacr']) {
     if ($(rank).value && (venue[rank] || 'none') !== $(rank).value) return false;
   }
   return !$('region').value || $('region').value === venue.region;
@@ -124,7 +123,6 @@ function render() {
     else tab.removeAttribute('aria-current');
   }
   $('kind-filter').hidden = state.tab !== 'catalog';
-  $('grade-filter').hidden = state.tab === 'calendar';
   $('status-filter').hidden = state.tab !== 'calendar';
   $('timezone').textContent = state.tab === 'catalog' ? '' : '本地时间 · ' + new Intl.DateTimeFormat().resolvedOptions().timeZone;
   $('results').setAttribute('aria-busy', state.catalogLoading || (state.tab !== 'catalog' && state.deadlineLoading));
