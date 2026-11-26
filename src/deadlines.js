@@ -158,7 +158,7 @@ export async function syncDeadlines(db, fetchSource = fetch) {
   }
 }
 
-export async function deadlineResponse(db, ctx) {
+export async function deadlineResponse(db, ctx, request) {
   const record = await readDb(db);
   if (!record?.payload && (!record?.last_attempt || Date.now() - record.last_attempt > 120_000)) {
     ctx.waitUntil(syncDeadlines(db).catch((error) => console.error('Initial deadline sync:', error.message)));
@@ -170,12 +170,16 @@ export async function deadlineResponse(db, ctx) {
     lastAttempt: record?.last_attempt || null,
     status: record?.result || 'waiting',
   };
-  return new Response('{"sync":' + JSON.stringify(meta) + ',' + payload.slice(1), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': status === 200 ? 'public, max-age=60' : 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
+  const headers = new Headers({
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': status === 200 ? 'public, max-age=60' : 'no-store',
+    'X-Content-Type-Options': 'nosniff',
   });
+  if (status === 200) {
+    const tag = 'W/"' + [meta.lastSuccess, meta.lastAttempt, meta.status].join('-') + '"';
+    headers.set('ETag', tag);
+    const validators = request.headers.get('If-None-Match')?.split(',').map((value) => value.trim()) || [];
+    if (validators.includes(tag) || validators.includes('*')) return new Response(null, { status: 304, headers });
+  }
+  return new Response('{"sync":' + JSON.stringify(meta) + ',' + payload.slice(1), { status, headers });
 }

@@ -48,7 +48,7 @@ async function handle(request, env, ctx) {
   const path = url.pathname;
   const isGet = request.method === 'GET';
   if (!path.startsWith('/api/')) return env.ASSETS.fetch(request);
-  if (path === '/api/deadlines' && isGet) return deadlineResponse(env.DB, ctx);
+  if (path === '/api/deadlines' && isGet) return deadlineResponse(env.DB, ctx, request);
   if (path === '/api/auth/github' && isGet) return startLogin(request, env);
   if (path === '/api/auth/github/callback' && isGet) return finishLogin(request, env);
   if (path === '/api/me' && isGet) {
