@@ -23,6 +23,8 @@ def new_entry(row):
     kind = {"会议": "conference", "期刊": "journal"}[row["类型"]]
     ccf = row["CCF"]
     cacr = row["CACR"]
+    grade = row["成果类别"]
+    assert grade in {"A", "B", "C"}, name
     assert ccf in RANKS and cacr in RANKS and (ccf, cacr) != ("-", "-"), name
     details = row["目录详情"]
     international = sorted(set(re.findall(r"CCF 国际 2026 · ([ABC])类", details)))
@@ -45,6 +47,7 @@ def new_entry(row):
     identifier = hashlib.sha256(f"{kind}:{unicodedata.normalize('NFC', name)}".encode()).hexdigest()[:16]
     entry = {"id": identifier, "name": name, "kind": kind, "aliases": aliases,
              "ccf": None if ccf == "-" else ccf, "cacr": None if cacr == "-" else cacr,
+             "grade": grade,
              "international": international, "chinese": chinese, "region": region}
     if links and region != "unknown":
         entry["regionSources"] = links[:3]

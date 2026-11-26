@@ -59,15 +59,22 @@ test('public catalog preserves candidate types, original Chinese tiers and publi
   assert.equal(catalog.length, 760);
   assert.equal(catalog.filter((entry) => entry.kind === 'conference').length, 396);
   assert.equal(new Set(catalog.map((entry) => entry.id)).size, 760);
-  const allowed = new Set(['id', 'name', 'kind', 'aliases', 'ccf', 'cacr', 'international', 'chinese', 'region',
+  const allowed = new Set(['id', 'name', 'kind', 'aliases', 'ccf', 'cacr', 'grade', 'international', 'chinese', 'region',
     'regionSources', 'dblp']);
   for (const entry of catalog) {
     assert.ok(entry.ccf || entry.cacr);
+    assert.match(entry.grade, /^[ABC]$/);
+    const sourceGrades = [entry.ccf, entry.cacr].filter(Boolean).sort();
+    assert.ok(entry.grade <= sourceGrades[0]);
+    if (entry.kind === 'conference') assert.equal(entry.grade, sourceGrades[0]);
     assert.ok(Object.keys(entry).every((key) => allowed.has(key)));
   }
   const chinese = catalog.find((entry) => entry.name === 'Chinese Journal of Electronics');
   assert.deepEqual(chinese.chinese, ['T1']);
   assert.equal(chinese.ccf, 'A');
+  const sciUpgrade = catalog.find((entry) => entry.name === 'Advanced Engineering Informatics');
+  assert.equal(sciUpgrade.ccf, 'B');
+  assert.equal(sciUpgrade.grade, 'A');
   const cvm = catalog.filter((entry) => entry.name.startsWith('Computational Visual Media'));
   assert.equal(new Set(cvm.map((entry) => entry.kind)).size, 2);
 });

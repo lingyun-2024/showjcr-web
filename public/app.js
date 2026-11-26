@@ -8,7 +8,7 @@ const tabTitles = {
   favorites: ['我的截稿', '查看已收藏的会议届次与近期截稿时间。'],
 };
 const deadlineStatus = { upcoming: '即将截稿', closed: '已截止', tbd: '待公布' };
-const fields = ['search', 'kind', 'ccf', 'cacr', 'region', 'status'];
+const fields = ['search', 'kind', 'grade', 'ccf', 'cacr', 'region', 'status'];
 const state = {
   tab: 'calendar', count: PAGE_SIZE, catalog: [], byId: new Map(), covered: new Set(),
   editions: [], favorites: [], user: null, loginAvailable: false, catalogLoading: true,
@@ -44,6 +44,7 @@ function message(value = '') {
 function tags(entry, showType = false) {
   const bits = [];
   if (showType) bits.push(entry.kind === 'conference' ? '会议' : '期刊');
+  if (state.tab !== 'calendar' && entry.grade) bits.push('成果 ' + entry.grade);
   const ccf = [...entry.international, ...entry.chinese].join(' / ');
   if (ccf) bits.push('CCF ' + ccf);
   if (entry.cacr) bits.push('CACR ' + entry.cacr);
@@ -70,6 +71,7 @@ function matches(venue) {
   const query = normalize($('search').value);
   if (query && ![venue.name, ...venue.aliases].some((name) => normalize(name).includes(query))) return false;
   if (state.tab === 'catalog' && $('kind').value && venue.kind !== $('kind').value) return false;
+  if (state.tab !== 'calendar' && $('grade').value && venue.grade !== $('grade').value) return false;
   for (const rank of ['ccf', 'cacr']) {
     if ($(rank).value && (venue[rank] || 'none') !== $(rank).value) return false;
   }
@@ -122,6 +124,7 @@ function render() {
     else tab.removeAttribute('aria-current');
   }
   $('kind-filter').hidden = state.tab !== 'catalog';
+  $('grade-filter').hidden = state.tab === 'calendar';
   $('status-filter').hidden = state.tab !== 'calendar';
   $('timezone').textContent = state.tab === 'catalog' ? '' : '本地时间 · ' + new Intl.DateTimeFormat().resolvedOptions().timeZone;
   $('results').setAttribute('aria-busy', state.catalogLoading || (state.tab !== 'catalog' && state.deadlineLoading));
